@@ -34,7 +34,7 @@
   Now when you call fred(), observer_fun will be executed, then fred will
   be executed.
   
-  To restore fred to its original state, you must ** RE-ASSING ** the
+  To restore fred to its original state, you must ** RE-ASSIGN ** the
   reference after calling the .popObserver method:
   
   fred = fred.popObserver();
