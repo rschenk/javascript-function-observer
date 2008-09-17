@@ -27,12 +27,17 @@
   var observer_fun = function() { /* Observer body */ }
   
   To create the observer you must ** RE-ASSIGN ** your function's reference
-  after calling the .observe_with_with() method:
+  after calling the .pushObserver() method:
   
-  fred = fred.observe_with_with( observer_fun );
+  fred = fred.pushObserver( observer_fun );
   
   Now when you call fred(), observer_fun will be executed, then fred will
   be executed.
+  
+  To restore fred to its original state, you must ** RE-ASSING ** the
+  reference after calling the .popObserver method:
+  
+  fred = fred.popObserver();
   
 == A COMPLETE EXAMPLE
   
@@ -40,7 +45,7 @@
      fun:function(){ console.log("Hello from testobj.fun!"); }
    };
 
-   testobj.fun = testobj.fun.observe_with( function(){
+   testobj.fun = testobj.fun.pushObserver( function(){
      console.log("Hello from Observer #1");
    });
 
@@ -48,9 +53,9 @@
    // => Hello from Observer #1
    // => Hello from testobj.fun!
 
-   testobj.fun = testobj.fun.observe_with( function(){ console.log("Hello from Observer #2"); } );
-   testobj.fun = testobj.fun.observe_with( function(){ console.log("Hello from Observer #3"); } );
-   testobj.fun = testobj.fun.observe_with( function(){ console.log("Hello from Observer #4"); } );
+   testobj.fun = testobj.fun.pushObserver( function(){ console.log("Hello from Observer #2"); } );
+   testobj.fun = testobj.fun.pushObserver( function(){ console.log("Hello from Observer #3"); } );
+   testobj.fun = testobj.fun.pushObserver( function(){ console.log("Hello from Observer #4"); } );
 
    testobj.fun();
     // => Hello from Observer #4
@@ -82,7 +87,7 @@
   whats_my_scope = "window";
   observer = function(){ console.log("Observer is executing in " + this.whats_my_scope ); };
 
-  testobj.fun = testobj.fun.observe_with(observer);
+  testobj.fun = testobj.fun.pushObserver(observer);
   testobj.fun();
   // => Observer is executing in window
   // => testobj.fun is executing in testobj
@@ -91,10 +96,10 @@
 
 == EUTHENASIA
 
-  The observe_with function can accept an options object. Currently, the
+  The pushObserver function can accept an options object. Currently, the
   only option is execute_method. This defaults to true.
   
-  Passing in { execute_method: false } to observe_with will still execute the
+  Passing in { execute_method: false } to pushObserver will still execute the
   observer function, but will prevent the observed function from executing
 
   Example: 
@@ -107,6 +112,6 @@
     console.log("Please! Make it stop!!");
   }
 
-  annoying = annoying.observe_with(euthanizer, {execute_method: false} );
+  annoying = annoying.pushObserver(euthanizer, {execute_method: false} );
   annoying();
   // => Please! Make it stop!!
