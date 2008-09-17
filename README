@@ -1,0 +1,112 @@
+= Javascript Function Observer
+
+   Function observation framework by Ryan Schenk, 2008
+   rschenk@gmail.com
+
+== DESCRIPTION
+  
+  This tiny "framework" allows you to attach an observer function to another 
+  JavaScript function. 
+  
+== FEATURES
+  
+  * Attach an observer to any function
+  * Executes your observer in its own scope
+  * Prevent the observed function from executing, if desired
+  * Chain multiple observers on top of each other
+  * Returns the value of your observed function
+
+== BASIC USAGE
+
+  First, define a function that you'd like to observe:
+  
+  var fred = function() { /* Fred does something useful */ };
+  
+  Next, define an observer:
+  
+  var observer_fun = function() { /* Observer body */ }
+  
+  To create the observer you must ** RE-ASSIGN ** your function's reference
+  after calling the .observe_with_with() method:
+  
+  fred = fred.observe_with_with( observer_fun );
+  
+  Now when you call fred(), observer_fun will be executed, then fred will
+  be executed.
+  
+== A COMPLETE EXAMPLE
+  
+   testobj = { 
+     fun:function(){ console.log("Hello from testobj.fun!"); }
+   };
+
+   testobj.fun = testobj.fun.observe_with( function(){
+     console.log("Hello from Observer #1");
+   });
+
+   testobj.fun();
+   // => Hello from Observer #1
+   // => Hello from testobj.fun!
+
+   testobj.fun = testobj.fun.observe_with( function(){ console.log("Hello from Observer #2"); } );
+   testobj.fun = testobj.fun.observe_with( function(){ console.log("Hello from Observer #3"); } );
+   testobj.fun = testobj.fun.observe_with( function(){ console.log("Hello from Observer #4"); } );
+
+   testobj.fun();
+    // => Hello from Observer #4
+    // => Hello from Observer #3
+    // => Hello from Observer #2
+    // => Hello from Observer #1
+    // => Hello from testobj.fun!
+
+   testobj.fun = testobj.fun.popObserver();
+   testobj.fun();
+    // => Hello from Observer #3
+    // => Hello from Observer #2
+    // => Hello from Observer #1
+    // => Hello from testobj.fun!
+
+   testobj.fun = testobj.fun.unObserve();
+   testobj.fun();
+    // => Hello from testobj.fun!
+
+
+
+== SCOPING
+
+  testobj = {
+    whats_my_scope:"testobj",
+    fun:function(){ console.log("testobj.fun is executing in " + this.whats_my_scope); }
+  };
+
+  whats_my_scope = "window";
+  observer = function(){ console.log("Observer is executing in " + this.whats_my_scope ); };
+
+  testobj.fun = testobj.fun.observe_with(observer);
+  testobj.fun();
+  // => Observer is executing in window
+  // => testobj.fun is executing in testobj
+
+
+
+== EUTHENASIA
+
+  The observe_with function can accept an options object. Currently, the
+  only option is execute_method. This defaults to true.
+  
+  Passing in { execute_method: false } to observe_with will still execute the
+  observer function, but will prevent the observed function from executing
+
+  Example: 
+  
+  function annoying() {
+    console.log("I'm a Barbie girl in the Barbie world! Life in plastic, it's fantastic!");
+  }
+
+  function euthanizer(){
+    console.log("Please! Make it stop!!");
+  }
+
+  annoying = annoying.observe_with(euthanizer, {execute_method: false} );
+  annoying();
+  // => Please! Make it stop!!
